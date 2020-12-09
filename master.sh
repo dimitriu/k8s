@@ -8,9 +8,17 @@ cp /etc/kubernetes/admin.conf /vagrant/admin.conf
 systemctl daemon-reload
 systemctl restart kubelet
 
-echo "sleeping 1 minute"
-sleep 60
+echo "sleeping 1 minute" && sleep 60
 
-kubectl --kubeconfig='/vagrant/admin.conf' apply -f /vagrant/rbac-kdd.yaml
-kubectl --kubeconfig='/vagrant/admin.conf' apply -f /vagrant/calico.yaml
 
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+kubectl apply -f /vagrant/rbac-kdd.yaml
+kubectl apply -f /vagrant/tigera-operator.yaml
+kubectl apply -f /vagrant/calico.yaml
+
+curl -o sono.tgz -kL https://github.com/vmware-tanzu/sonobuoy/releases/download/v0.19.0/sonobuoy_0.19.0_linux_amd64.tar.gz
+tar xzvf sono.tgz
+./sonobuoy run --mode=certified-conformance

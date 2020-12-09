@@ -22,6 +22,3 @@ EOF
 apt-get update
 apt-get install -qy kubelet kubeadm kubectl
 apt-mark hold kubelet kubeadm kubectl
-
-touch /var/lib/kubelet/config.yaml
-
